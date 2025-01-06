@@ -1,25 +1,64 @@
-import type Gtk from 'gi://Gtk';
+import Gtk from 'gi://Gtk';
+import Adw from 'gi://Adw';
+import Gio from 'gi://Gio';
+import {
+    ExtensionPreferences,
+    gettext as _,
+} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
 
-import {ExtensionPreferences} from 'resource:///org/gnome/Shell/Extensions/js/extensions/prefs.js';
+export default class GnomeRectanglePreferences extends ExtensionPreferences {
+    _settings?: Gio.Settings;
 
-export default class HelloGnomeAppPrefs extends ExtensionPreferences {
-    /**
-     * Get the single widget that implements the extension's preferences.
-     *
-     * @returns The widget that implements the extension's preferences.
-     */
-    getPreferencesWidget(): Promise<Gtk.Widget> {
-        // Alternetively, you can use the `fillPreferencesWindow` method for
-        // more control over the preferences window. Only implement one of the
-        // methods.
+    fillPreferencesWindow(window: Adw.PreferencesWindow) {
+        this._settings = this.getSettings();
+
+        const page = new Adw.PreferencesPage({
+            title: _('General'),
+            iconName: 'dialog-information-symbolic',
+        });
+
+        const animationGroup = new Adw.PreferencesGroup({
+            title: _('Animation'),
+            description: _('Configure move/resize animation'),
+        });
+        page.add(animationGroup);
+
+        const animationEnabled = new Adw.SwitchRow({
+            title: _('Enabled'),
+            subtitle: _('Wether to animate windows'),
+        });
+        animationGroup.add(animationEnabled);
+
+        const paddingGroup = new Adw.PreferencesGroup({
+            title: _('Paddings'),
+            description: _('Configure the padding between windows'),
+        });
+        page.add(paddingGroup);
+
+        const paddingInner = new Adw.SpinRow({
+            title: _('Inner'),
+            subtitle: _('Padding between windows'),
+            adjustment: new Gtk.Adjustment({
+                lower: 0,
+                upper: 1000,
+                stepIncrement: 1,
+            }),
+        });
+        paddingGroup.add(paddingInner);
+
+        window.add(page);
+
+        this._settings!.bind(
+            'animate',
+            animationEnabled,
+            'active',
+            Gio.SettingsBindFlags.DEFAULT,
+        );
+        this._settings!.bind(
+            'padding-inner',
+            paddingInner,
+            'value',
+            Gio.SettingsBindFlags.DEFAULT,
+        );
     }
-
-    /**
-     * Fill the preferences window.
-     *
-     * @param window - The preferences window to fill.
-     */
-    // fillPreferencesWindow(window: Adw.Window): Promise<void> {
-    //     The default implementation adds the widget returned by `getPreferencesWidget`.
-    // }
 }

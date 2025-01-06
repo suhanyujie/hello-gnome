@@ -1,0 +1,12 @@
+{
+  "name": "hello-gnome-app",
+  "description": "first gnome extension",
+  "uuid": "suhanyujie-hello-gnome",
+  "shell-version": [
+    "46"
+  ],
+  "settings-schema": "suhanyujie-hello-gnome",
+  "gettext-domain": "suhanyujie-hello-gnome",
+  "version-name": "1.0.0",
+  "url": "https://github.com/suhanyujie"
+}
